@@ -17,7 +17,8 @@ import {
   Layers,
   Menu,
   X,
-  CheckCircle
+  CheckCircle,
+  Leaf
 } from 'lucide-react';
 
 // Seed items for a fresh experience if localstorage is empty
@@ -338,6 +339,7 @@ const Wardrobe = () => {
     { label: 'Outfit Builder', hash: '#builder', icon: Sparkles },
     { label: 'Cost Tracker', hash: '#tracker', icon: DollarSign },
     { label: 'Trip Planner', hash: '#planner', icon: Compass },
+    { label: 'Eco-Impact', hash: '#eco', icon: Leaf },
     { label: 'Support & Help', hash: '#contact', icon: Mail }
   ];
 
@@ -345,7 +347,7 @@ const Wardrobe = () => {
   const selectedCount = [builderSlots.top, builderSlots.bottom, builderSlots.shoes].filter(Boolean).length;
 
   return (
-    <div className="pt-24 min-h-screen bg-background pb-20 px-4 md:px-8">
+    <div className="pt-10 min-h-screen bg-background pb-20 px-4 md:px-8">
       {/* Toast Notification */}
       <AnimatePresence>
         {toast && (
@@ -485,7 +487,7 @@ const Wardrobe = () => {
                   <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform" />
                   <div>
                     <span className="text-sm font-bold text-gray-400 uppercase tracking-wider">Average Cost Per Wear (CPW)</span>
-                    <h2 className="text-5xl font-extrabold text-accent mt-2">${averageCPW.toFixed(2)}</h2>
+                    <h2 className="text-5xl font-extrabold text-accent mt-2">₹{averageCPW.toFixed(2)}</h2>
                   </div>
                   <div className="text-xs text-gray-400 mt-6 flex items-start gap-1">
                     <Info className="w-3.5 h-3.5 mt-0.5 text-accent flex-shrink-0" />
@@ -657,7 +659,7 @@ const Wardrobe = () => {
                             <h4 className="font-extrabold text-primary text-lg truncate mb-1">{item.name}</h4>
                             <div className="flex justify-between text-sm text-gray-500 mb-4">
                               <span>Color: <strong>{item.color}</strong></span>
-                              <span>Price: <strong>${item.price.toFixed(2)}</strong></span>
+                              <span>Price: <strong>₹{item.price.toFixed(2)}</strong></span>
                             </div>
                             
                             {/* Analytics info inside item */}
@@ -668,7 +670,7 @@ const Wardrobe = () => {
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-gray-400">Cost Per Wear:</span>
-                                <span className="font-bold text-accent">${singleCPW.toFixed(2)}</span>
+                                <span className="font-bold text-accent">₹{singleCPW.toFixed(2)}</span>
                               </div>
                             </div>
                           </div>
@@ -767,7 +769,7 @@ const Wardrobe = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Price ($) *</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Price (₹) *</label>
                             <input
                               type="number"
                               step="0.01"
@@ -817,6 +819,45 @@ const Wardrobe = () => {
           )}
 
           {/* ========================================================================= */}
+          {/* ECO-IMPACT MODULE */}
+          {/* ========================================================================= */}
+          {activeTab === '#eco' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4"
+            >
+              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-center items-center text-center">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                  <Leaf className="text-green-600" size={40} />
+                </div>
+                <h3 className="text-3xl font-extrabold text-primary mb-2">Sustainability Impact</h3>
+                <p className="text-gray-500 mb-6 max-w-sm">
+                  By re-wearing your clothes instead of buying new ones, you are actively saving the planet. Here is your lifetime impact based on your wardrobe wears.
+                </p>
+                <div className="w-full bg-green-50 p-6 rounded-2xl border border-green-100">
+                  <div className="text-sm font-bold text-green-700 uppercase tracking-wider mb-1">Water Saved</div>
+                  <div className="text-4xl font-black text-green-600">{(items.reduce((acc, item) => acc + (item.wears || 0), 0) * 12.5).toFixed(1)} Liters</div>
+                </div>
+              </div>
+
+              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-center items-center text-center">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                  <TrendingUp className="text-blue-600" size={40} />
+                </div>
+                <h3 className="text-3xl font-extrabold text-primary mb-2">Carbon Footprint</h3>
+                <p className="text-gray-500 mb-6 max-w-sm">
+                  Fast fashion contributes heavily to carbon emissions. Here is how much CO2 you've avoided emitting.
+                </p>
+                <div className="w-full bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                  <div className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-1">CO2 Avoided</div>
+                  <div className="text-4xl font-black text-blue-600">{(items.reduce((acc, item) => acc + (item.wears || 0), 0) * 2.1).toFixed(1)} kg</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ========================================================================= */}
           {/* OUTFIT BUILDER MODULE */}
           {/* ========================================================================= */}
           {activeTab === '#builder' && (
@@ -857,7 +898,7 @@ const Wardrobe = () => {
                       {builderSlots.top ? (
                         <div>
                           <h4 className="font-bold text-primary truncate text-sm">{builderSlots.top.name}</h4>
-                          <span className="text-xs text-gray-500">Color: {builderSlots.top.color} &bull; ${builderSlots.top.price.toFixed(2)}</span>
+                          <span className="text-xs text-gray-500">Color: {builderSlots.top.color} &bull; ₹{builderSlots.top.price.toFixed(2)}</span>
                         </div>
                       ) : (
                         <span className="text-xs text-gray-400">Select a shirt, jacket, or dress</span>
@@ -884,7 +925,7 @@ const Wardrobe = () => {
                       {builderSlots.bottom ? (
                         <div>
                           <h4 className="font-bold text-primary truncate text-sm">{builderSlots.bottom.name}</h4>
-                          <span className="text-xs text-gray-500">Color: {builderSlots.bottom.color} &bull; ${builderSlots.bottom.price.toFixed(2)}</span>
+                          <span className="text-xs text-gray-500">Color: {builderSlots.bottom.color} &bull; ₹{builderSlots.bottom.price.toFixed(2)}</span>
                         </div>
                       ) : (
                         <span className="text-xs text-gray-400">Select pants, shorts, or jeans</span>
@@ -911,7 +952,7 @@ const Wardrobe = () => {
                       {builderSlots.shoes ? (
                         <div>
                           <h4 className="font-bold text-primary truncate text-sm">{builderSlots.shoes.name}</h4>
-                          <span className="text-xs text-gray-500">Color: {builderSlots.shoes.color} &bull; ${builderSlots.shoes.price.toFixed(2)}</span>
+                          <span className="text-xs text-gray-500">Color: {builderSlots.shoes.color} &bull; ₹{builderSlots.shoes.price.toFixed(2)}</span>
                         </div>
                       ) : (
                         <span className="text-xs text-gray-400">Select sneakers, boots, or heels</span>
@@ -1024,7 +1065,7 @@ const Wardrobe = () => {
                                   <span className="text-xs text-gray-500">Color: {item.color} &bull; Season: {item.season}</span>
                                 </div>
                                 <div className="text-right">
-                                  <span className="font-bold text-primary text-sm block">${item.price.toFixed(2)}</span>
+                                  <span className="font-bold text-primary text-sm block">₹{item.price.toFixed(2)}</span>
                                   <span className="text-xs text-accent">Wears: {item.wears}</span>
                                 </div>
                               </div>
@@ -1104,9 +1145,9 @@ const Wardrobe = () => {
                                 {item.category}
                               </span>
                             </td>
-                            <td className="py-4 px-4 font-semibold text-gray-600">${item.price.toFixed(2)}</td>
+                            <td className="py-4 px-4 font-semibold text-gray-600">₹{item.price.toFixed(2)}</td>
                             <td className="py-4 px-4 font-semibold text-gray-600">{item.wears || 0} wears</td>
-                            <td className="py-4 px-4 font-extrabold text-accent">${item.cpw.toFixed(2)}</td>
+                            <td className="py-4 px-4 font-extrabold text-accent">₹{item.cpw.toFixed(2)}</td>
                             <td className="py-4 px-4">
                               <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
                                 efficiency === 'Excellent' 

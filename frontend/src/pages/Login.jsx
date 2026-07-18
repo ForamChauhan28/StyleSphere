@@ -7,8 +7,16 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Simulate login success since MongoDB is blocked
-    localStorage.setItem('user', JSON.stringify({ name: 'User' }));
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') || '';
+    const isAdmin = email.toLowerCase().includes('admin');
+    
+    // Simulate login success, assigning admin privileges if email contains "admin"
+    localStorage.setItem('user', JSON.stringify({ 
+      name: isAdmin ? 'Admin' : 'User', 
+      email, 
+      isAdmin 
+    }));
     window.location.href = '/';
   };
 
@@ -23,26 +31,35 @@ const Login = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="glass z-10 p-10 rounded-3xl w-full max-w-md"
       >
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 className="text-4xl font-extrabold text-primary tracking-tight">Welcome Back</h1>
           <p className="text-gray-600 mt-2">Sign in to your StyleSphere account</p>
+        </div>
+
+        <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 mb-6 text-sm text-orange-800">
+          <strong className="block mb-1 text-orange-950 font-bold">Admin Sign In Tip:</strong>
+          To log in as an administrator, use an email containing <code className="bg-orange-100 px-1.5 py-0.5 rounded font-mono text-orange-950">admin</code> (e.g. <code className="bg-orange-100 px-1.5 py-0.5 rounded font-mono text-orange-950">admin@stylesphere.com</code>).
         </div>
 
         <form className="space-y-6" onSubmit={handleLogin}>
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
             <input 
+              name="email"
               type="email" 
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
               placeholder="you@example.com"
+              required
             />
           </div>
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
             <input 
+              name="password"
               type="password" 
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
               placeholder="••••••••"
+              required
             />
           </div>
           

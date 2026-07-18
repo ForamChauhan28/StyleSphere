@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
@@ -12,15 +13,22 @@ app.use(cors());
 app.use(express.json());
 
 // Database connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Foram:Foram%402820@cluster0.y4zbvu7.mongodb.net/style-sphere?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
-// Basic route
-app.get('/', (req, res) => {
-  res.send('StyleSphere API is running');
+// Admin routes
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Handle React routing, return all requests to React app
+app.get(/(.*)/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 // Start server

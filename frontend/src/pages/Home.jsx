@@ -1,19 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Hero3D from '../components/Hero3D';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import { ShoppingCart } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 
 const Home = () => {
-  const trendingProducts = [
-    { id: 1, name: 'Vintage Denim Jacket', price: '$89.99', img: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?q=80&w=2070&auto=format&fit=crop' },
-    { id: 2, name: 'Summer Floral Dress', price: '$59.99', img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop' },
-    { id: 3, name: 'Classic White Sneakers', price: '$79.99', img: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2070&auto=format&fit=crop' },
-    { id: 4, name: 'Urban Street Hoodie', price: '$49.99', img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2080&auto=format&fit=crop' },
-  ];
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const { addToast } = useToast();
+  const [trendingProducts, setTrendingProducts] = useState([]);
+
+  const handleAddToCart = (e, product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product);
+    addToast('Item added to cart!');
+  };
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const res = await axios.get('/api/admin/products');
+        // Select a subset of products for trending section (e.g., first 4)
+        setTrendingProducts(res.data.slice(0, 4));
+      } catch (err) {
+        console.error('Error fetching trending products:', err);
+      }
+    };
+    fetchTrending();
+  }, []);
 
   return (
     <div className="relative min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-[calc(100vh-5rem)] min-h-[600px] flex items-center justify-center overflow-hidden pb-16">
         <Hero3D />
         
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pointer-events-none">
@@ -29,9 +52,9 @@ const Home = () => {
             <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
               Discover the latest trends in clothing, blending futuristic 3D aesthetics with timeless style.
             </p>
-            <button className="pointer-events-auto bg-secondary hover:bg-yellow-500 text-white px-8 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+            <Link to="/shop" className="inline-block pointer-events-auto bg-secondary hover:bg-yellow-500 text-white px-8 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
               Shop Now
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -44,34 +67,41 @@ const Home = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {trendingProducts.map((product, index) => (
               <motion.div 
-                key={product.id}
+                key={product._id}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="glass rounded-2xl overflow-hidden group cursor-pointer"
+                whileHover={{ 
+                  scale: 1.03, 
+                  rotateY: 2, 
+                  rotateX: -2,
+                  transition: { duration: 0.2 } 
+                }}
+                className="glass rounded-3xl overflow-hidden group hover:shadow-2xl transition-all duration-300 transform-gpu cursor-pointer"
               >
-                <div className="relative h-80 overflow-hidden">
-                  <img 
-                    src={product.img} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button className="bg-white text-primary px-6 py-2 rounded-full font-semibold transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                      View Details
+                <Link to={`/product/${product._id}`}>
+                  <div className="relative h-72 overflow-hidden">
+                    <img 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-black text-primary shadow-lg">
+                      ₹{product.price}
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-textMain mb-4 h-14 line-clamp-2">{product.name}</h3>
+                    <button 
+                      onClick={(e) => handleAddToCart(e, product)}
+                      className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-2 shadow-md"
+                    >
+                      <ShoppingCart size={18} />
+                      Add to Cart
                     </button>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-textMain mb-2">{product.name}</h3>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-secondary">{product.price}</span>
-                    <button className="text-primary hover:text-accent transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    </button>
-                  </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>

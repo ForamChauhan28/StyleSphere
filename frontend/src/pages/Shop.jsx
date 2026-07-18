@@ -2,63 +2,127 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
-
-const mockProducts = [
-  // Men
-  { id: 1, name: 'Vintage Denim Jacket', price: 89.99, category: 'men', img: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?q=80&w=2070&auto=format&fit=crop' },
-  { id: 2, name: 'Classic White Sneakers', price: 79.99, category: 'men', img: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2070&auto=format&fit=crop' },
-  { id: 5, name: 'Casual Linen Shirt', price: 45.00, category: 'men', img: 'https://images.unsplash.com/photo-1588359348347-9bc6cbb6858a?q=80&w=2000&auto=format&fit=crop' },
-  
-  // Women
-  { id: 3, name: 'Summer Floral Dress', price: 59.99, category: 'women', img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop' },
-  { id: 4, name: 'Elegant Evening Gown', price: 120.00, category: 'women', img: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?q=80&w=2071&auto=format&fit=crop' },
-  { id: 6, name: 'Leather Crossbody Bag', price: 65.99, category: 'women', img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=2069&auto=format&fit=crop' },
-  
-  // Kids
-  { id: 7, name: 'Kids Striped T-Shirt', price: 25.00, category: 'kids', img: 'https://images.unsplash.com/photo-1519241047957-be31d7379a5d?q=80&w=2070&auto=format&fit=crop' },
-  { id: 8, name: 'Toddler Denim Overalls', price: 35.00, category: 'kids', img: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=2000&auto=format&fit=crop' },
-];
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
+import axios from 'axios';
 
 const Shop = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [products, setProducts] = useState(mockProducts);
+  const { addToCart } = useCart();
+  const { addToast } = useToast();
+  const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  // Subcategory classifier
+  const getSubcategory = (p) => {
+    const name = p.name.toLowerCase();
+    if (name.includes('saree')) return 'saree';
+    if (name.includes('jacket') || name.includes('hoodie')) return 'jackets & hoodies';
+    if (name.includes('sneakers') || name.includes('shoes')) return 'shoes';
+    if (name.includes('shirt') || name.includes('blouse')) return 'shirts & tops';
+    if (name.includes('jeans') || name.includes('chinos') || name.includes('overalls')) return 'trousers & denim';
+    if (name.includes('dress') || name.includes('gown')) return 'dresses & gowns';
+    if (name.includes('watch')) return 'watches';
+    if (name.includes('makeup') || name.includes('lipstick')) return 'beauty';
+    if (name.includes('bag')) return 'bags';
+    return 'other';
+  };
+
+  // Get available subcategories dynamically for the current category filter
+  const getAvailableSubcategories = () => {
+    const subsSet = new Set(
+      allProducts
+        .filter(p => activeCategory === 'all' || p.category === activeCategory)
+        .map(p => getSubcategory(p))
+    );
+    subsSet.delete('other');
+    return ['all', ...Array.from(subsSet)];
+  };
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get('/api/admin/products');
+        setAllProducts(res.data);
+        setProducts(res.data);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    if (allProducts.length === 0) return;
+
     const params = new URLSearchParams(location.search);
     const category = params.get('category');
     const search = params.get('search');
+    const subcategory = params.get('subcategory');
     
-    let filtered = mockProducts;
+    let filtered = [...allProducts];
+    let currentCategory = 'all';
     
     if (category && ['men', 'women', 'kids'].includes(category)) {
-      setActiveCategory(category);
+      currentCategory = category;
       filtered = filtered.filter(p => p.category === category);
-    } else {
-      setActiveCategory('all');
     }
+    
+    setActiveCategory(currentCategory);
 
     if (search) {
-      filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+      const searchTerms = search.toLowerCase().split(' ');
+      filtered = filtered.filter(p => {
+        const searchText = `${p.name} ${p.category} ${p.description}`.toLowerCase();
+        return searchTerms.some(term => {
+          return searchText.includes(term) ||
+                 (term.endsWith('es') && searchText.includes(term.slice(0, -2))) ||
+                 (term.endsWith('s') && searchText.includes(term.slice(0, -1)));
+        });
+      });
       setActiveCategory('search');
     }
 
-    setProducts(filtered);
-  }, [location.search]);
+    if (subcategory) {
+      setSelectedSubcategory(subcategory);
+      filtered = filtered.filter(p => getSubcategory(p) === subcategory);
+    } else {
+      setSelectedSubcategory('all');
+    }
 
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    // Simulate auth requirement
-    alert('Please sign in to add items to your cart.');
-    navigate('/login');
+    setProducts(filtered);
+  }, [location.search, allProducts]);
+
+  const handleSubcategoryClick = (sub) => {
+    const params = new URLSearchParams(location.search);
+    if (sub === 'all') {
+      params.delete('subcategory');
+    } else {
+      params.set('subcategory', sub);
+    }
+    navigate(`/shop?${params.toString()}`);
   };
 
+  const handleAddToCart = (e, product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product);
+    addToast('Item added to cart!');
+  };
+
+  const availableSubcategories = getAvailableSubcategories();
+
   return (
-    <div className="pt-24 min-h-screen bg-background pb-20">
+    <div className="pt-8 min-h-screen bg-background pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-8">
           <div>
             <h1 className="text-5xl font-extrabold text-primary mb-3">
               {activeCategory === 'search' ? 'Search Results' : activeCategory === 'all' ? 'All Collections' : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}'s Collection`}
@@ -83,30 +147,58 @@ const Shop = () => {
           </div>
         </div>
 
+        {/* Dynamic Category Filter Pills */}
+        {!loading && activeCategory !== 'search' && availableSubcategories.length > 1 && (
+          <div className="flex items-center gap-3 overflow-x-auto pb-6 mb-8 scrollbar-hide border-b border-gray-100/50">
+            <span className="text-gray-400 font-bold text-sm uppercase tracking-wider mr-2 select-none">Filters:</span>
+            {availableSubcategories.map(sub => (
+              <button
+                key={sub}
+                onClick={() => handleSubcategoryClick(sub)}
+                className={`px-6 py-2 rounded-xl text-sm font-bold capitalize transition-all border ${
+                  selectedSubcategory === sub
+                    ? 'bg-primary text-white border-primary shadow-lg shadow-gray-900/10'
+                    : 'bg-white/50 backdrop-blur-md text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-white/80'
+                }`}
+              >
+                {sub}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {products.map((product, index) => (
+          {loading ? (
+            <div className="col-span-full text-center py-20 text-xl font-medium">Loading products...</div>
+          ) : products.map((product, index) => (
             <motion.div 
-              key={product.id}
+              key={product._id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="glass rounded-3xl overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+              whileHover={{ 
+                scale: 1.03, 
+                rotateY: 2, 
+                rotateX: -2,
+                transition: { duration: 0.2 } 
+              }}
+              className="glass rounded-3xl overflow-hidden group hover:shadow-2xl transition-all duration-300 transform-gpu cursor-pointer"
             >
-              <Link to={`/product/${product.id}`}>
+              <Link to={`/product/${product._id}`}>
                 <div className="relative h-72 overflow-hidden">
                   <img 
-                    src={product.img} 
+                    src={product.image} 
                     alt={product.name} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-black text-primary shadow-lg">
-                    ${product.price}
+                    ₹{product.price}
                   </div>
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-textMain mb-4 h-14 line-clamp-2">{product.name}</h3>
                   <button 
-                    onClick={handleAddToCart}
+                    onClick={(e) => handleAddToCart(e, product)}
                     className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-2 shadow-md"
                   >
                     <ShoppingCart size={18} />
