@@ -69,9 +69,9 @@ const Shop = () => {
     let filtered = [...allProducts];
     let currentCategory = 'all';
     
-    if (category && ['men', 'women', 'kids'].includes(category)) {
-      currentCategory = category;
-      filtered = filtered.filter(p => p.category === category);
+    if (category && ['men', 'women', 'kids'].includes(category.toLowerCase())) {
+      currentCategory = category.toLowerCase();
+      filtered = filtered.filter(p => p.category === category.toLowerCase());
     }
     
     setActiveCategory(currentCategory);

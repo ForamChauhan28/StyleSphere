@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
@@ -44,7 +45,7 @@ const AuthModal = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  return (
+  return ReactDOM.createPortal(
     <AnimatePresence>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <motion.div 
@@ -176,7 +177,8 @@ const AuthModal = ({ isOpen, onClose }) => {
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

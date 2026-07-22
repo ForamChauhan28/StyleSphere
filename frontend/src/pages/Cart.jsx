@@ -150,7 +150,9 @@ const Cart = () => {
           </div>
         </div>
       </div>
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AnimatePresence>
+        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
 };

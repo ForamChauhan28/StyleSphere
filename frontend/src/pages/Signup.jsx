@@ -1,23 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Loader2 } from 'lucide-react';
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     const formData = new FormData(e.currentTarget);
+    const name = formData.get('name') || '';
     const email = formData.get('email') || '';
-    const name = formData.get('name') || 'User';
-    const isAdmin = email.toLowerCase().includes('admin');
-    
-    localStorage.setItem('user', JSON.stringify({ 
-      name, 
-      email, 
-      isAdmin 
-    }));
-    window.location.href = '/';
+    const password = formData.get('password') || '';
+    const confirmPassword = formData.get('confirmPassword') || '';
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(`${API}/api/signup`, { name, email, password });
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      window.location.href = '/';
+    } catch (err) {
+      setError(err.response?.data?.message || 'Signup failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,10 +54,11 @@ const Signup = () => {
           <p className="text-gray-600 mt-2">Join StyleSphere today</p>
         </div>
 
-        <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 mb-6 text-sm text-orange-800">
-          <strong className="block mb-1 text-orange-950 font-bold">Admin Account Tip:</strong>
-          To sign up as an administrator, enter an email address containing <code className="bg-orange-100 px-1.5 py-0.5 rounded font-mono text-orange-950">admin</code> (e.g. <code className="bg-orange-100 px-1.5 py-0.5 rounded font-mono text-orange-950">admin@stylesphere.com</code>).
-        </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 text-sm text-red-600">
+            {error}
+          </div>
+        )}
 
         <form className="space-y-4" onSubmit={handleSignup}>
           <div>
@@ -64,22 +84,32 @@ const Signup = () => {
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">Password</label>
             <input 
+              name="password"
               type="password" 
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
               placeholder="••••••••"
+              required
+              minLength={6}
             />
           </div>
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">Confirm Password</label>
             <input 
+              name="confirmPassword"
               type="password" 
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
               placeholder="••••••••"
+              required
+              minLength={6}
             />
           </div>
           
-          <button className="w-full bg-primary hover:bg-gray-800 text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-gray-400/50 mt-4">
-            Sign Up
+          <button 
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary hover:bg-gray-800 text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-gray-400/50 mt-4 flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign Up'}
           </button>
         </form>
 

@@ -1,23 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Loader2 } from 'lucide-react';
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') || '';
-    const isAdmin = email.toLowerCase().includes('admin');
-    
-    // Simulate login success, assigning admin privileges if email contains "admin"
-    localStorage.setItem('user', JSON.stringify({ 
-      name: isAdmin ? 'Admin' : 'User', 
-      email, 
-      isAdmin 
-    }));
-    window.location.href = '/';
+    const password = formData.get('password') || '';
+
+    try {
+      const { data } = await axios.post(`${API}/api/login`, { email, password });
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      window.location.href = '/';
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,10 +47,11 @@ const Login = () => {
           <p className="text-gray-600 mt-2">Sign in to your StyleSphere account</p>
         </div>
 
-        <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 mb-6 text-sm text-orange-800">
-          <strong className="block mb-1 text-orange-950 font-bold">Admin Sign In Tip:</strong>
-          To log in as an administrator, use an email containing <code className="bg-orange-100 px-1.5 py-0.5 rounded font-mono text-orange-950">admin</code> (e.g. <code className="bg-orange-100 px-1.5 py-0.5 rounded font-mono text-orange-950">admin@stylesphere.com</code>).
-        </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 text-sm text-red-600">
+            {error}
+          </div>
+        )}
 
         <form className="space-y-6" onSubmit={handleLogin}>
           <div>
@@ -60,6 +72,7 @@ const Login = () => {
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
               placeholder="••••••••"
               required
+              minLength={6}
             />
           </div>
           
@@ -71,8 +84,12 @@ const Login = () => {
             <a href="#" className="text-sm font-bold text-secondary hover:text-yellow-600">Forgot password?</a>
           </div>
 
-          <button className="w-full bg-primary hover:bg-gray-800 text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-gray-400/50">
-            Sign In
+          <button 
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary hover:bg-gray-800 text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-gray-400/50 flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign In'}
           </button>
         </form>
 

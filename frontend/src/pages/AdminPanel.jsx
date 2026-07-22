@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, ShoppingBag, Users, Tag, LogOut, Menu, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, ShoppingBag, Users, Tag, LogOut, Menu, X, ArrowLeft, Home } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import AdminProducts from '../components/admin/AdminProducts';
 import AdminUsers from '../components/admin/AdminUsers';
 import AdminOffers from '../components/admin/AdminOffers';
@@ -12,6 +12,7 @@ const AdminPanel = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [stats, setStats] = useState({ totalProducts: '--', totalUsers: '--', activeOffers: '--' });
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -29,7 +30,8 @@ const AdminPanel = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/login');
+    window.dispatchEvent(new Event('auth-change'));
+    navigate('/');
   };
 
   const navItems = [
@@ -38,6 +40,14 @@ const AdminPanel = () => {
     { id: 'users', label: 'Users', icon: Users },
     { id: 'offers', label: 'Offers', icon: Tag },
   ];
+
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+    // Only close sidebar on mobile
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -49,29 +59,72 @@ const AdminPanel = () => {
         return <AdminOffers />;
       default:
         return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Dashboard Stats */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
-              <div className="p-4 bg-blue-50 text-accent rounded-xl"><ShoppingBag size={24} /></div>
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Total Products</p>
-                <h3 className="text-2xl font-bold text-primary">{stats.totalProducts}</h3>
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => setActiveTab('products')}
+                className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 cursor-pointer hover:shadow-md hover:border-blue-100 transition-all"
+              >
+                <div className="p-4 bg-blue-50 text-accent rounded-xl"><ShoppingBag size={24} /></div>
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Total Products</p>
+                  <h3 className="text-2xl font-bold text-primary">{stats.totalProducts}</h3>
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                onClick={() => setActiveTab('users')}
+                className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 cursor-pointer hover:shadow-md hover:border-orange-100 transition-all"
+              >
+                <div className="p-4 bg-orange-50 text-secondary rounded-xl"><Users size={24} /></div>
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Total Users</p>
+                  <h3 className="text-2xl font-bold text-primary">{stats.totalUsers}</h3>
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                onClick={() => setActiveTab('offers')}
+                className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 cursor-pointer hover:shadow-md hover:border-green-100 transition-all"
+              >
+                <div className="p-4 bg-green-50 text-green-600 rounded-xl"><Tag size={24} /></div>
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Active Offers</p>
+                  <h3 className="text-2xl font-bold text-primary">{stats.activeOffers}</h3>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              <h3 className="text-lg font-bold text-primary mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className="flex items-center gap-3 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-medium transition-colors"
+                >
+                  <ShoppingBag size={18} /> Manage Products
+                </button>
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className="flex items-center gap-3 px-4 py-3 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-xl font-medium transition-colors"
+                >
+                  <Users size={18} /> Manage Users
+                </button>
+                <button
+                  onClick={() => setActiveTab('offers')}
+                  className="flex items-center gap-3 px-4 py-3 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl font-medium transition-colors"
+                >
+                  <Tag size={18} /> Manage Offers
+                </button>
               </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
-              <div className="p-4 bg-orange-50 text-secondary rounded-xl"><Users size={24} /></div>
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Total Users</p>
-                <h3 className="text-2xl font-bold text-primary">{stats.totalUsers}</h3>
-              </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
-              <div className="p-4 bg-green-50 text-green-600 rounded-xl"><Tag size={24} /></div>
-              <div>
-                <p className="text-gray-500 text-sm font-medium">Active Offers</p>
-                <h3 className="text-2xl font-bold text-primary">{stats.activeOffers}</h3>
-              </div>
-            </motion.div>
+            </div>
           </div>
         );
     }
@@ -79,11 +132,20 @@ const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-background flex overflow-hidden">
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-10 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <motion.aside
-        initial={{ x: -250 }}
-        animate={{ x: isSidebarOpen ? 0 : -250 }}
-        className={`fixed md:relative z-20 w-64 bg-primary h-screen text-white flex flex-col shadow-2xl transition-all duration-300`}
+        initial={false}
+        animate={{ x: isSidebarOpen ? 0 : -260 }}
+        transition={{ type: 'tween', duration: 0.25 }}
+        className="fixed md:relative z-20 w-64 bg-primary h-screen text-white flex flex-col shadow-2xl"
       >
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -104,10 +166,10 @@ const AdminPanel = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+                onClick={() => handleTabClick(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive 
-                    ? 'bg-secondary text-primary font-bold shadow-lg shadow-orange-500/20' 
+                  isActive
+                    ? 'bg-secondary text-primary font-bold shadow-lg shadow-orange-500/20'
                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                 }`}
               >
@@ -118,8 +180,15 @@ const AdminPanel = () => {
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-800">
-          <button 
+        <div className="p-4 border-t border-gray-800 space-y-1">
+          <Link
+            to="/"
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+          >
+            <Home size={20} />
+            <span>Back to Store</span>
+          </Link>
+          <button
             onClick={handleLogout}
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-red-500/10 hover:text-red-500 transition-colors"
           >
@@ -132,24 +201,40 @@ const AdminPanel = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
-        <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 h-20 px-8 flex items-center justify-between sticky top-0 z-10">
+        <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 h-16 px-6 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center space-x-4">
             <button className="md:hidden text-gray-500 hover:text-primary" onClick={() => setIsSidebarOpen(true)}>
               <Menu size={24} />
             </button>
-            <h1 className="text-2xl font-bold text-primary capitalize">{activeTab}</h1>
+            {/* Breadcrumb navigation */}
+            <div className="flex items-center gap-2 text-sm">
+              {activeTab !== 'dashboard' && (
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className="text-gray-400 hover:text-primary transition-colors flex items-center gap-1"
+                >
+                  <ArrowLeft size={16} />
+                  Dashboard
+                </button>
+              )}
+              <h1 className={`text-xl font-bold text-primary capitalize ${activeTab !== 'dashboard' ? 'ml-2' : ''}`}>
+                {activeTab}
+              </h1>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-sm text-right hidden sm:block">
-              <p className="font-bold text-primary">Admin User</p>
-              <p className="text-gray-500 text-xs">admin@stylesphere.com</p>
+              <p className="font-bold text-primary">{user?.name || 'Admin User'}</p>
+              <p className="text-gray-500 text-xs">{user?.email || 'admin@stylesphere.com'}</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-secondary to-orange-400 shadow-md"></div>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-secondary to-orange-400 shadow-md flex items-center justify-center text-white font-bold">
+              {user?.avatar || 'A'}
+            </div>
           </div>
         </header>
 
         {/* Dynamic Content */}
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8">
           <div className="max-w-6xl mx-auto">
             {renderContent()}
           </div>

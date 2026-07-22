@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Package, Clock, CheckCircle2, FileText, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -28,7 +29,7 @@ const OrdersModal = ({ isOpen, onClose }) => {
     }
   ];
 
-  return (
+  return ReactDOM.createPortal(
     <AnimatePresence>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <motion.div 
@@ -144,7 +145,8 @@ const OrdersModal = ({ isOpen, onClose }) => {
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 
