@@ -23,7 +23,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await axios.get('/api/admin/products');
+        const res = await axios.get('/api/products');
         // Select a subset of products for trending section (e.g., first 4)
         setTrendingProducts(res.data.slice(0, 4));
       } catch (err) {

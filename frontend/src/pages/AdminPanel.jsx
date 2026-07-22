@@ -1,15 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LayoutDashboard, ShoppingBag, Users, Tag, LogOut, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdminProducts from '../components/admin/AdminProducts';
 import AdminUsers from '../components/admin/AdminUsers';
 import AdminOffers from '../components/admin/AdminOffers';
+import axios from 'axios';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [stats, setStats] = useState({ totalProducts: '--', totalUsers: '--', activeOffers: '--' });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get('/api/admin/stats');
+        setStats(response.data);
+      } catch (error) {
+        console.error('Error fetching admin stats:', error);
+      }
+    };
+    if (activeTab === 'dashboard') {
+      fetchStats();
+    }
+  }, [activeTab]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -39,21 +55,21 @@ const AdminPanel = () => {
               <div className="p-4 bg-blue-50 text-accent rounded-xl"><ShoppingBag size={24} /></div>
               <div>
                 <p className="text-gray-500 text-sm font-medium">Total Products</p>
-                <h3 className="text-2xl font-bold text-primary">--</h3>
+                <h3 className="text-2xl font-bold text-primary">{stats.totalProducts}</h3>
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
               <div className="p-4 bg-orange-50 text-secondary rounded-xl"><Users size={24} /></div>
               <div>
                 <p className="text-gray-500 text-sm font-medium">Total Users</p>
-                <h3 className="text-2xl font-bold text-primary">--</h3>
+                <h3 className="text-2xl font-bold text-primary">{stats.totalUsers}</h3>
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
               <div className="p-4 bg-green-50 text-green-600 rounded-xl"><Tag size={24} /></div>
               <div>
                 <p className="text-gray-500 text-sm font-medium">Active Offers</p>
-                <h3 className="text-2xl font-bold text-primary">--</h3>
+                <h3 className="text-2xl font-bold text-primary">{stats.activeOffers}</h3>
               </div>
             </motion.div>
           </div>

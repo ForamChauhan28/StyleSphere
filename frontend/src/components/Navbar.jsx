@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, Search, ChevronDown } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Search, ChevronDown, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
+import AuthModal from './AuthModal';
+import OrdersModal from './OrdersModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +15,21 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setUser(JSON.parse(localStorage.getItem('user') || 'null'));
+    };
+    window.addEventListener('auth-change', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    return () => {
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
+  }, []);
 
   const megaMenuData = {
     men: {
@@ -98,9 +115,6 @@ const Navbar = () => {
   };
   
   const trendingSearches = ['shoes', 't shirts', 'watches', 'sarees'];
-  
-  const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-  const user = storedUser || { name: '23DCEO13 FORAM CHAUHAN', avatar: '2' };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -219,57 +233,79 @@ const Navbar = () => {
               </button>
             </form>
             {/* Account Dropdown */}
-            <div className="relative group">
-              <button 
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-                className="flex items-center gap-2 border border-gray-200 rounded-full py-1.5 px-3 hover:bg-white/50 transition-colors bg-white/30 backdrop-blur-md"
-              >
-                <div className="w-6 h-6 bg-[#d4815a] rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                  {user.avatar || user.name.charAt(0)}
-                </div>
-                <ChevronDown size={14} className="text-gray-600" />
-              </button>
+            {user ? (
+              <div className="relative group">
+                <button 
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
+                  className="flex items-center gap-2 border border-gray-200 rounded-full py-1.5 px-3 hover:bg-white/50 transition-colors bg-white/30 backdrop-blur-md"
+                >
+                  <div className="w-6 h-6 bg-[#d4815a] rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                    {user.avatar || user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <ChevronDown size={14} className="text-gray-600" />
+                </button>
 
-              <AnimatePresence>
-                {isDropdownOpen && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] py-2 z-50 border border-gray-100/50"
-                  >
-                    <div className="px-4 py-3 border-b border-gray-100">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider truncate">
-                        {user.name}
-                      </p>
-                    </div>
-                    <div className="py-1 border-b border-gray-100">
-                      <Link to="/dashboard" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f6f2ee] transition-colors">
-                        Dashboard
-                      </Link>
-                      <Link to="/profile" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f6f2ee] transition-colors bg-[#f1ebe3]">
-                        Account
-                      </Link>
-                      {user.isAdmin && (
-                        <Link to="/admin" className="block px-4 py-2.5 text-sm text-orange-600 font-bold hover:bg-orange-50 transition-colors">
-                          Admin Panel
+                <AnimatePresence>
+                  {isDropdownOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] py-2 z-50 border border-gray-100/50"
+                    >
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider truncate">
+                          {user.name}
+                        </p>
+                      </div>
+                      <div className="py-1 border-b border-gray-100">
+                        <Link to="/dashboard" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f6f2ee] transition-colors">
+                          Dashboard
                         </Link>
-                      )}
-                    </div>
-                    <div className="py-1">
-                      <button 
-                        onClick={() => { localStorage.removeItem('user'); window.location.reload(); }}
-                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f6f2ee] transition-colors"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                        <button 
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            setIsOrdersModalOpen(true);
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f6f2ee] transition-colors flex items-center gap-2"
+                        >
+                          <Package size={16} /> Returns & Orders
+                        </button>
+                        <Link to="/profile" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f6f2ee] transition-colors bg-[#f1ebe3]">
+                          Account
+                        </Link>
+                        {user.isAdmin && (
+                          <Link to="/admin" className="block px-4 py-2.5 text-sm text-orange-600 font-bold hover:bg-orange-50 transition-colors">
+                            Admin Panel
+                          </Link>
+                        )}
+                      </div>
+                      <div className="py-1">
+                        <button 
+                          onClick={() => { 
+                            localStorage.removeItem('user'); 
+                            window.dispatchEvent(new Event('auth-change'));
+                            setIsDropdownOpen(false);
+                          }}
+                          className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-[#f6f2ee] transition-colors"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsAuthModalOpen(true)}
+                className="flex items-center gap-2 font-bold text-primary hover:text-secondary transition-colors"
+              >
+                Sign In
+              </button>
+            )}
             <Link to="/cart" className="text-textMain hover:text-secondary transition-colors relative">
               <ShoppingCart size={20} />
               {getCartCount() > 0 && (
@@ -359,10 +395,39 @@ const Navbar = () => {
             <Link to="/" className="block px-3 py-2 text-textMain hover:bg-gray-100 rounded-md">Home</Link>
             <Link to="/shop" className="block px-3 py-2 text-textMain hover:bg-gray-100 rounded-md">Shop</Link>
             <Link to="/wardrobe" className="block px-3 py-2 text-textMain hover:bg-gray-100 rounded-md font-medium text-secondary">Wardrobe Organizer</Link>
-            <Link to="/login" className="block px-3 py-2 text-textMain hover:bg-gray-100 rounded-md">Login</Link>
+            {user ? (
+              <>
+                <button 
+                  onClick={() => { setIsOpen(false); setIsOrdersModalOpen(true); }}
+                  className="w-full text-left px-3 py-2 text-textMain hover:bg-gray-100 rounded-md"
+                >
+                  Returns & Orders
+                </button>
+                <button 
+                  onClick={() => { 
+                    localStorage.removeItem('user'); 
+                    window.dispatchEvent(new Event('auth-change'));
+                  }}
+                  className="w-full text-left px-3 py-2 text-textMain hover:bg-gray-100 rounded-md"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={() => { setIsOpen(false); setIsAuthModalOpen(true); }}
+                className="w-full text-left px-3 py-2 text-textMain hover:bg-gray-100 rounded-md"
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </motion.div>
       )}
+
+      {/* Modals */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <OrdersModal isOpen={isOrdersModalOpen} onClose={() => setIsOrdersModalOpen(false)} />
     </nav>
   );
 };

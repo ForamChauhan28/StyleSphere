@@ -13,7 +13,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/users');
+      const response = await axios.get('/api/admin/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -24,7 +24,7 @@ const AdminUsers = () => {
 
   const toggleAdmin = async (id, currentStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/admin/users/${id}/admin`, { isAdmin: !currentStatus });
+      await axios.put(`/api/admin/users/${id}/admin`, { isAdmin: !currentStatus });
       fetchUsers();
     } catch (error) {
       console.error('Error updating user role:', error);
@@ -34,7 +34,7 @@ const AdminUsers = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/admin/users/${id}`);
+        await axios.delete(`/api/admin/users/${id}`);
         fetchUsers();
       } catch (error) {
         console.error('Error deleting user:', error);

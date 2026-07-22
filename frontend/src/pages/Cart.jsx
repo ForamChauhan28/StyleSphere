@@ -1,17 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import AuthModal from '../components/AuthModal';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCart();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setUser(JSON.parse(localStorage.getItem('user') || 'null'));
+    };
+    window.addEventListener('auth-change', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    return () => {
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
+  }, []);
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       addToast("Your cart is empty!", 'error');
+      return;
+    }
+    if (!user) {
+      addToast("Please sign in to proceed to checkout", 'error');
+      setIsAuthModalOpen(true);
       return;
     }
     addToast("Checkout successful! Thank you for your purchase.", 'success');
@@ -130,6 +150,7 @@ const Cart = () => {
           </div>
         </div>
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 };

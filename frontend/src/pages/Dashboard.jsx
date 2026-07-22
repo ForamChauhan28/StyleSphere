@@ -1,10 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-  const user = storedUser || { name: '23DCEO13 FORAM CHAUHAN' };
+
+  const [user, setUser] = React.useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   return (
     <div className="pt-8 min-h-screen bg-background pb-20">

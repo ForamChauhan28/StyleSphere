@@ -13,7 +13,7 @@ const AdminOffers = () => {
 
   const fetchOffers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/offers');
+      const response = await axios.get('/api/admin/offers');
       setOffers(response.data);
     } catch (error) {
       console.error('Error fetching offers:', error);
@@ -25,7 +25,7 @@ const AdminOffers = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this offer?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/admin/offers/${id}`);
+        await axios.delete(`/api/admin/offers/${id}`);
         fetchOffers();
       } catch (error) {
         console.error('Error deleting offer:', error);
@@ -35,7 +35,7 @@ const AdminOffers = () => {
 
   const toggleStatus = async (id, currentStatus) => {
      try {
-       await axios.put(`http://localhost:5000/api/admin/offers/${id}`, { isActive: !currentStatus });
+       await axios.put(`/api/admin/offers/${id}`, { isActive: !currentStatus });
        fetchOffers();
      } catch (error) {
        console.error('Error toggling offer status:', error);

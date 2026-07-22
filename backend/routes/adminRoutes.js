@@ -4,6 +4,18 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const Offer = require('../models/Offer');
 
+// Stats
+router.get('/stats', async (req, res) => {
+  try {
+    const totalProducts = await Product.countDocuments();
+    const totalUsers = await User.countDocuments();
+    const activeOffers = await Offer.countDocuments({ isActive: true });
+    res.json({ totalProducts, totalUsers, activeOffers });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Users
 router.get('/users', async (req, res) => {
   try {

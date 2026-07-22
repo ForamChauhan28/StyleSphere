@@ -81,12 +81,12 @@ const ProductDetail = () => {
     window.scrollTo(0, 0);
     const fetchProductAndRelated = async () => {
       try {
-        const productRes = await axios.get(`/api/admin/products/${id}`);
+        const productRes = await axios.get(`/api/products/${id}`);
         const foundProduct = productRes.data;
         setProduct(foundProduct);
         setCurrentImage(foundProduct.image);
 
-        const allProductsRes = await axios.get('/api/admin/products');
+        const allProductsRes = await axios.get('/api/products');
         const related = allProductsRes.data
           .filter(p => p.category === foundProduct.category && p._id !== foundProduct._id)
           .slice(0, 4);

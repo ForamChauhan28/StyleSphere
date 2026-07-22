@@ -46,7 +46,7 @@ const Shop = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('/api/admin/products');
+        const res = await axios.get('/api/products');
         setAllProducts(res.data);
         setProducts(res.data);
       } catch (err) {

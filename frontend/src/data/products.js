@@ -1,5 +1,5 @@
 export const products = [
-  // Men
+  // MEN
   { 
     id: 1, 
     name: 'Vintage Denim Jacket', 
@@ -39,7 +39,7 @@ export const products = [
     name: 'Urban Street Hoodie', 
     price: 4149, 
     category: 'men', 
-    img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2080&auto=format&fit=crop',
+    img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2000&auto=format&fit=crop',
     description: "Embrace the urban lifestyle with this comfortable and stylish street hoodie. Perfect for chilly evenings."
   },
   { 
@@ -50,8 +50,40 @@ export const products = [
     img: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=2000&auto=format&fit=crop',
     description: "Versatile tailored fit chinos that easily transition from the office to the weekend. Crafted for maximum comfort."
   },
-  
-  // Women
+  {
+    id: 19,
+    name: 'Graphic Print T-Shirt',
+    price: 1499,
+    category: 'men',
+    img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2000&auto=format&fit=crop',
+    description: "A comfortable, everyday graphic t-shirt made with 100% breathable cotton."
+  },
+  {
+    id: 20,
+    name: 'Running Sports Shoes',
+    price: 4999,
+    category: 'men',
+    img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2000&auto=format&fit=crop',
+    description: "Lightweight and breathable running shoes built for maximum performance and style."
+  },
+  {
+    id: 24,
+    name: 'Leather Formal Shoes',
+    price: 6499,
+    category: 'men',
+    img: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=2000&auto=format&fit=crop',
+    description: "Premium handcrafted leather formal shoes for men. Perfect for office and evening wear."
+  },
+  {
+    id: 27,
+    name: 'Plain Basic T-Shirts (Combo)',
+    price: 1999,
+    category: 'men',
+    img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2000&auto=format&fit=crop',
+    description: "Essential plain basic t-shirts for your daily wardrobe. Includes black, white, and grey."
+  },
+
+  // WOMEN
   { 
     id: 3, 
     name: 'Summer Floral Dress', 
@@ -101,15 +133,31 @@ export const products = [
     description: "Complete your look with our premium makeup palette. High-quality shades perfect for any occasion."
   },
   {
-    id: 16,
-    name: 'Luxury Matte Lipstick',
-    price: 1992,
+    id: 17,
+    name: 'Elegant Silk Saree',
+    price: 8999,
     category: 'women',
-    img: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=2000&auto=format&fit=crop',
-    description: "A bold, long-lasting matte lipstick that provides a flawless finish without drying your lips."
+    img: 'https://images.unsplash.com/photo-1615886753866-79396abc446e?q=80&w=2000&auto=format&fit=crop',
+    description: "A beautifully crafted traditional silk saree. Perfect for weddings, festivals, and special occasions."
+  },
+  {
+    id: 21,
+    name: 'Designer Party Wear Saree',
+    price: 15499,
+    category: 'women',
+    img: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?q=80&w=2000&auto=format&fit=crop',
+    description: "Make a statement with this heavily embroidered designer party wear saree."
+  },
+  {
+    id: 25,
+    name: 'Women Casual Sneakers',
+    price: 3999,
+    category: 'women',
+    img: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=2000&auto=format&fit=crop',
+    description: "Trendy, comfortable, and versatile casual sneakers for everyday fashion."
   },
   
-  // Kids
+  // KIDS
   { 
     id: 7, 
     name: 'Kids Striped T-Shirt', 
@@ -142,16 +190,40 @@ export const products = [
     img: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?q=80&w=2000&auto=format&fit=crop',
     description: "Vibrant and comfortable sneakers designed for active kids. Easy to slip on and off."
   },
-  
-  // Trending Additions based on Flipkart reference
   {
-    id: 17,
-    name: 'Elegant Silk Saree',
-    price: 8999,
-    category: 'women',
-    img: 'https://images.unsplash.com/photo-1615886753866-79396abc446e?q=80&w=2000&auto=format&fit=crop',
-    description: "A beautifully crafted traditional silk saree. Perfect for weddings, festivals, and special occasions."
+    id: 23,
+    name: 'Kids Cartoon T-Shirts',
+    price: 2199,
+    category: 'kids',
+    img: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=2000&auto=format&fit=crop',
+    description: "Fun and vibrant cartoon print t-shirts for kids. Made with ultra-soft organic cotton."
   },
+  {
+    id: 28,
+    name: 'Kids Puffer Vest',
+    price: 3100,
+    category: 'kids',
+    img: 'https://images.unsplash.com/photo-1519457431-44ccd64a579b?q=80&w=2000&auto=format&fit=crop',
+    description: "A stylish puffer vest to keep the little ones warm without restricting movement."
+  },
+  {
+    id: 29,
+    name: 'Summer Shorts Set',
+    price: 1800,
+    category: 'kids',
+    img: 'https://images.unsplash.com/photo-1604467794349-0b74285de7e7?q=80&w=2000&auto=format&fit=crop',
+    description: "Comfortable and breathable summer shorts set, ideal for active sunny days."
+  },
+  {
+    id: 30,
+    name: 'Girls Sparkle Dress',
+    price: 4200,
+    category: 'kids',
+    img: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?q=80&w=2000&auto=format&fit=crop',
+    description: "A magical sparkle dress perfect for birthday parties and festive occasions."
+  },
+
+  // ACCESSORIES
   {
     id: 18,
     name: 'Classic Chronograph Watch',
@@ -159,32 +231,6 @@ export const products = [
     category: 'accessories',
     img: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2000&auto=format&fit=crop',
     description: "A sophisticated chronograph watch with a leather strap. Timeless elegance for your wrist."
-  },
-  {
-    id: 19,
-    name: 'Graphic Print T-Shirt',
-    price: 1499,
-    category: 'men',
-    img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2000&auto=format&fit=crop',
-    description: "A comfortable, everyday graphic t-shirt made with 100% breathable cotton."
-  },
-  {
-    id: 20,
-    name: 'Running Sports Shoes',
-    price: 4999,
-    category: 'men',
-    img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2000&auto=format&fit=crop',
-    description: "Lightweight and breathable running shoes built for maximum performance and style."
-  },
-  
-  // Additional Items for better variety
-  {
-    id: 21,
-    name: 'Designer Party Wear Saree',
-    price: 15499,
-    category: 'women',
-    img: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?q=80&w=2000&auto=format&fit=crop',
-    description: "Make a statement with this heavily embroidered designer party wear saree."
   },
   {
     id: 22,
@@ -195,44 +241,12 @@ export const products = [
     description: "Track your health and stay connected with this state-of-the-art smart fitness watch."
   },
   {
-    id: 23,
-    name: 'Kids Cartoon T-Shirts (Pack of 3)',
-    price: 2199,
-    category: 'kids',
-    img: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=2000&auto=format&fit=crop',
-    description: "Fun and vibrant cartoon print t-shirts for kids. Made with ultra-soft organic cotton."
-  },
-  {
-    id: 24,
-    name: 'Leather Formal Shoes',
-    price: 6499,
-    category: 'men',
-    img: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=2000&auto=format&fit=crop',
-    description: "Premium handcrafted leather formal shoes for men. Perfect for office and evening wear."
-  },
-  {
-    id: 25,
-    name: 'Women Casual Sneakers',
-    price: 3999,
-    category: 'women',
-    img: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=2000&auto=format&fit=crop',
-    description: "Trendy, comfortable, and versatile casual sneakers for everyday fashion."
-  },
-  {
     id: 26,
     name: 'Luxury Rose Gold Watch',
     price: 18999,
-    category: 'women',
+    category: 'accessories',
     img: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=2000&auto=format&fit=crop',
     description: "A stunning luxury rose gold watch featuring a minimalist dial and premium mesh band."
-  },
-  {
-    id: 27,
-    name: 'Plain Basic T-Shirts (Combo)',
-    price: 1999,
-    category: 'men',
-    img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2000&auto=format&fit=crop',
-    description: "Essential plain basic t-shirts for your daily wardrobe. Includes black, white, and grey."
   }
 ];
 

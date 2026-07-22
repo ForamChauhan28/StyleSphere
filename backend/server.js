@@ -23,6 +23,10 @@ mongoose.connect(MONGODB_URI)
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/api/admin', adminRoutes);
 
+// Public routes
+const publicRoutes = require('./routes/publicRoutes');
+app.use('/api', publicRoutes);
+
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
