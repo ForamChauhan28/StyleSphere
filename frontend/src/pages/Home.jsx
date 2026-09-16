@@ -1,17 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Hero3D from '../components/Hero3D';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import axios from 'axios';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Home = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addToast } = useToast();
   const [trendingProducts, setTrendingProducts] = useState([]);
+  const containerRef = useRef();
+
+  useGSAP(() => {
+    if (trendingProducts.length > 0) {
+      gsap.fromTo('.product-card', 
+        { opacity: 0, y: 100 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.8, 
+          stagger: 0.15, 
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.trending-section',
+            start: 'top 75%',
+          }
+        }
+      );
+    }
+  }, { dependencies: [trendingProducts], scope: containerRef });
 
   const handleAddToCart = (e, product) => {
     e.preventDefault();
@@ -60,7 +85,7 @@ const Home = () => {
       </section>
 
       {/* Trending Products */}
-      <section className="py-20 bg-background relative z-10">
+      <section ref={containerRef} className="trending-section py-20 bg-background relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-center text-primary mb-12">Trending Products</h2>
           
@@ -68,17 +93,13 @@ const Home = () => {
             {trendingProducts.map((product, index) => (
               <motion.div 
                 key={product._id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
                 whileHover={{ 
                   scale: 1.03, 
                   rotateY: 2, 
                   rotateX: -2,
                   transition: { duration: 0.2 } 
                 }}
-                className="glass rounded-3xl overflow-hidden group hover:shadow-2xl transition-all duration-300 transform-gpu cursor-pointer"
+                className="product-card opacity-0 glass rounded-3xl overflow-hidden group hover:shadow-2xl transition-all duration-300 transform-gpu cursor-pointer"
               >
                 <Link to={`/product/${product._id}`}>
                   <div className="relative h-72 overflow-hidden">

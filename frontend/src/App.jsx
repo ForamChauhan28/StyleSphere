@@ -1,5 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
+import SmoothScroll from './components/SmoothScroll'
 import { CartProvider } from './context/CartContext'
 import { ToastProvider } from './context/ToastContext'
 import Navbar from './components/Navbar'
@@ -18,6 +20,7 @@ import Wardrobe from './pages/Wardrobe'
 import Dashboard from './pages/Dashboard'
 import AdminPanel from './pages/AdminPanel'
 import ProtectedRoute from './components/ProtectedRoute'
+import AIStyleAssistant from './components/AIStyleAssistant'
 
 const MainLayout = ({ children }) => {
   const location = useLocation();
@@ -35,38 +38,50 @@ const MainLayout = ({ children }) => {
         {children}
       </main>
       <Footer />
+      <AIStyleAssistant />
     </div>
+  );
+};
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Home />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/wardrobe" element={<Wardrobe />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin" element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminPanel />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </AnimatePresence>
   );
 };
 
 function App() {
   return (
-    <ToastProvider>
-      <CartProvider>
-        <Router>
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/wardrobe" element={<Wardrobe />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin" element={
-                <ProtectedRoute adminOnly={true}>
-                  <AdminPanel />
-                </ProtectedRoute>
-              } />
-            </Routes>
-          </MainLayout>
-        </Router>
-      </CartProvider>
-    </ToastProvider>
+    <SmoothScroll>
+      <ToastProvider>
+        <CartProvider>
+          <Router>
+            <MainLayout>
+              <AnimatedRoutes />
+            </MainLayout>
+          </Router>
+        </CartProvider>
+      </ToastProvider>
+    </SmoothScroll>
   )
 }
 

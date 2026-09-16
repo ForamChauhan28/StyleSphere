@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, Search, ChevronDown, Package } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Search, ChevronDown, Package, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import AuthModal from './AuthModal';
 import OrdersModal from './OrdersModal';
+import VisualSearchModal from './VisualSearchModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [activeMegaMenu, setActiveMegaMenu] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
+  const [isVisualSearchModalOpen, setIsVisualSearchModalOpen] = useState(false);
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
 
   useEffect(() => {
@@ -191,7 +193,7 @@ const Navbar = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
                     onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-                    className="pl-4 pr-10 py-1.5 rounded-sm border border-gray-300 focus:outline-none focus:border-secondary shadow-sm text-sm"
+                    className="pl-4 pr-16 py-1.5 rounded-sm border border-gray-300 focus:outline-none focus:border-secondary shadow-sm text-sm"
                     autoFocus
                   />
                   
@@ -227,10 +229,20 @@ const Navbar = () => {
               <button 
                 type={isSearchOpen ? "submit" : "button"}
                 onClick={() => !isSearchOpen && setIsSearchOpen(true)}
-                className={`text-textMain hover:text-secondary transition-colors ${isSearchOpen ? 'absolute right-3 z-10' : ''}`}
+                className={`text-textMain hover:text-secondary transition-colors ${isSearchOpen ? 'absolute right-9 z-10' : ''}`}
               >
                 <Search size={20} />
               </button>
+              {isSearchOpen && (
+                <button
+                  type="button"
+                  onClick={() => { setIsSearchOpen(false); setIsVisualSearchModalOpen(true); }}
+                  className="absolute right-2 z-10 text-gray-400 hover:text-secondary transition-colors"
+                  title="Search by Image"
+                >
+                  <Camera size={20} />
+                </button>
+              )}
             </form>
             {/* Account Dropdown */}
             {user ? (
@@ -428,6 +440,7 @@ const Navbar = () => {
       {/* Modals */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <OrdersModal isOpen={isOrdersModalOpen} onClose={() => setIsOrdersModalOpen(false)} />
+      <VisualSearchModal isOpen={isVisualSearchModalOpen} onClose={() => setIsVisualSearchModalOpen(false)} />
     </nav>
   );
 };

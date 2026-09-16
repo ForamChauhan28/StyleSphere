@@ -2,9 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Package, Clock, CheckCircle2, FileText, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import MapLocationModal from './MapLocationModal';
+import TrackPackageModal from './TrackPackageModal';
+import ReturnPolicyModal from './ReturnPolicyModal';
+import ReviewModal from './ReviewModal';
 
 const OrdersModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+  const [activeSubModal, setActiveSubModal] = React.useState(null);
+
   if (!isOpen) return null;
 
   // Mock past orders for the demonstration
@@ -80,7 +87,7 @@ const OrdersModal = ({ isOpen, onClose }) => {
                       </div>
                       <div className="hidden sm:block">
                         <p className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Dispatch To</p>
-                        <p className="font-semibold text-secondary cursor-pointer hover:underline">New York, NY 10001</p>
+                        <p onClick={() => setActiveSubModal('map')} className="font-semibold text-secondary cursor-pointer hover:underline">New York, NY 10001</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -88,7 +95,7 @@ const OrdersModal = ({ isOpen, onClose }) => {
                       <div className="flex gap-3 text-sm font-semibold text-secondary">
                         <button className="hover:underline flex items-center gap-1"><FileText size={14}/> Invoice</button>
                         <span className="text-gray-300">|</span>
-                        <button className="hover:underline">Order Details</button>
+                        <button onClick={() => { onClose(); navigate('/product/1'); }} className="hover:underline">Order Details</button>
                       </div>
                     </div>
                   </div>
@@ -112,27 +119,27 @@ const OrdersModal = ({ isOpen, onClose }) => {
                           <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
-                          <Link to="/shop" onClick={onClose} className="text-lg font-bold text-primary hover:text-secondary transition-colors line-clamp-2">
+                          <button onClick={() => { onClose(); navigate('/product/1'); }} className="text-lg font-bold text-primary hover:text-secondary transition-colors line-clamp-2 text-left">
                             {item.name}
-                          </Link>
+                          </button>
                           <p className="text-sm text-gray-500 mt-1">Size: {item.size} | Color: {item.color} | Qty: {item.qty}</p>
                           <div className="mt-4 flex gap-3">
-                            <button className="bg-primary text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-gray-800 transition-colors shadow-sm">
+                            <button onClick={() => { onClose(); navigate('/product/1'); }} className="bg-primary text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-gray-800 transition-colors shadow-sm">
                               Buy it again
                             </button>
-                            <button className="bg-white border border-gray-300 text-gray-700 px-5 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm">
+                            <button onClick={() => { onClose(); navigate('/product/1'); }} className="bg-white border border-gray-300 text-gray-700 px-5 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm">
                               View your item
                             </button>
                           </div>
                         </div>
                         <div className="w-full md:w-auto flex flex-col gap-2 mt-4 md:mt-0 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
-                          <button className="w-full md:w-48 text-left px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex justify-between items-center">
+                          <button onClick={() => setActiveSubModal('track')} className="w-full md:w-48 text-left px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex justify-between items-center">
                             Track package <ChevronRight size={16} className="text-gray-400" />
                           </button>
-                          <button className="w-full md:w-48 text-left px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex justify-between items-center">
+                          <button onClick={() => setActiveSubModal('return')} className="w-full md:w-48 text-left px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex justify-between items-center">
                             Return or replace items <ChevronRight size={16} className="text-gray-400" />
                           </button>
-                          <button className="w-full md:w-48 text-left px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex justify-between items-center">
+                          <button onClick={() => setActiveSubModal('review')} className="w-full md:w-48 text-left px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex justify-between items-center">
                             Write a product review <ChevronRight size={16} className="text-gray-400" />
                           </button>
                         </div>
@@ -144,6 +151,12 @@ const OrdersModal = ({ isOpen, onClose }) => {
             </div>
           </div>
         </motion.div>
+        
+        {/* Sub-Modals */}
+        <MapLocationModal isOpen={activeSubModal === 'map'} onClose={() => setActiveSubModal(null)} />
+        <TrackPackageModal isOpen={activeSubModal === 'track'} onClose={() => setActiveSubModal(null)} />
+        <ReturnPolicyModal isOpen={activeSubModal === 'return'} onClose={() => setActiveSubModal(null)} />
+        <ReviewModal isOpen={activeSubModal === 'review'} onClose={() => setActiveSubModal(null)} />
       </div>
     </AnimatePresence>,
     document.body

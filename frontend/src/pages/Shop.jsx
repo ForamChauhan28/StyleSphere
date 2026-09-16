@@ -65,9 +65,19 @@ const Shop = () => {
     const category = params.get('category');
     const search = params.get('search');
     const subcategory = params.get('subcategory');
+    const visualSearch = params.get('visual_search');
     
     let filtered = [...allProducts];
     let currentCategory = 'all';
+
+    if (visualSearch) {
+      const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+      filtered = shuffled.slice(0, 4);
+      setActiveCategory('visual-search');
+      setSelectedSubcategory('all');
+      setProducts(filtered);
+      return;
+    }
     
     if (category && ['men', 'women', 'kids'].includes(category.toLowerCase())) {
       currentCategory = category.toLowerCase();
@@ -125,10 +135,10 @@ const Shop = () => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-8">
           <div>
             <h1 className="text-5xl font-extrabold text-primary mb-3">
-              {activeCategory === 'search' ? 'Search Results' : activeCategory === 'all' ? 'All Collections' : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}'s Collection`}
+              {activeCategory === 'visual-search' ? 'Shop this Look' : activeCategory === 'search' ? 'Search Results' : activeCategory === 'all' ? 'All Collections' : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}'s Collection`}
             </h1>
             <p className="text-gray-500 text-lg">
-              {activeCategory === 'search' ? `Showing results for your search` : `Discover the best styles curated just for you.`}
+              {activeCategory === 'visual-search' ? 'Here are some visually similar items based on your image.' : activeCategory === 'search' ? `Showing results for your search` : `Discover the best styles curated just for you.`}
             </p>
           </div>
           
@@ -148,7 +158,7 @@ const Shop = () => {
         </div>
 
         {/* Dynamic Category Filter Pills */}
-        {!loading && activeCategory !== 'search' && availableSubcategories.length > 1 && (
+        {!loading && activeCategory !== 'search' && activeCategory !== 'visual-search' && availableSubcategories.length > 1 && (
           <div className="flex items-center gap-3 overflow-x-auto pb-6 mb-8 scrollbar-hide border-b border-gray-100/50">
             <span className="text-gray-400 font-bold text-sm uppercase tracking-wider mr-2 select-none">Filters:</span>
             {availableSubcategories.map(sub => (
@@ -186,7 +196,8 @@ const Shop = () => {
             >
               <Link to={`/product/${product._id}`}>
                 <div className="relative h-72 overflow-hidden">
-                  <img 
+                  <motion.img 
+                    layoutId={`product-image-${product._id}`}
                     src={product.image} 
                     alt={product.name} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

@@ -4,7 +4,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import axios from 'axios';
-import { ShoppingCart, MapPin, Share2, Ruler, X, AlertCircle } from 'lucide-react';
+import { ShoppingCart, MapPin, Share2, Ruler, X, AlertCircle, Star } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 
 const ProductDetail = () => {
@@ -130,7 +130,8 @@ const ProductDetail = () => {
                 animate={{ opacity: 1, x: 0 }}
                 className="relative h-80 md:h-[450px] rounded-2xl overflow-hidden w-full"
               >
-                <img 
+                <motion.img 
+                  layoutId={`product-image-${product._id}`}
                   src={currentImage || product.image} 
                   alt={product.name} 
                   className="w-full h-full object-cover transition-opacity duration-300"
@@ -275,6 +276,59 @@ const ProductDetail = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+
+        {/* Customer Reviews (Mocked) */}
+        <div className="mt-12 glass rounded-3xl p-8 mb-16">
+           <h2 className="text-3xl font-bold text-primary mb-8 flex items-center gap-3">
+              Customer Reviews <span className="bg-secondary text-white text-sm px-3 py-1 rounded-full font-bold">4.8</span>
+           </h2>
+           
+           <div className="space-y-8">
+              {/* Mock Review 1 with Image */}
+              <div className="border-b border-gray-100 pb-8">
+                 <div className="flex items-center gap-4 mb-3">
+                    <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold">JD</div>
+                    <div>
+                       <p className="font-bold text-primary">Jane Doe</p>
+                       <div className="flex text-yellow-400">
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} fill="currentColor" />
+                       </div>
+                    </div>
+                    <span className="ml-auto text-sm text-gray-400">Oct 26, 2026</span>
+                 </div>
+                 <h4 className="font-bold text-gray-800 mb-2">Absolutely love this!</h4>
+                 <p className="text-gray-600 mb-4">The quality is amazing, exactly as described. The fit is perfect for me. I wore it out last night and got so many compliments!</p>
+                 <div className="flex gap-3 overflow-x-auto pb-2">
+                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=200&auto=format&fit=crop" alt="Review 1" className="w-24 h-24 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity" />
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=200&auto=format&fit=crop" alt="Review 2" className="w-24 h-24 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity" />
+                 </div>
+              </div>
+
+              {/* Mock Review 2 */}
+              <div className="pb-4">
+                 <div className="flex items-center gap-4 mb-3">
+                    <div className="w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center font-bold">MS</div>
+                    <div>
+                       <p className="font-bold text-primary">Mike Smith</p>
+                       <div className="flex text-yellow-400">
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} fill="currentColor" />
+                          <Star size={14} className="text-gray-300" />
+                       </div>
+                    </div>
+                    <span className="ml-auto text-sm text-gray-400">Oct 20, 2026</span>
+                 </div>
+                 <h4 className="font-bold text-gray-800 mb-2">Great buy, slightly large</h4>
+                 <p className="text-gray-600">Really nice material, but I would recommend sizing down if you want a more fitted look. Otherwise, it's perfect.</p>
+              </div>
+           </div>
         </div>
 
         {/* Related Products */}
