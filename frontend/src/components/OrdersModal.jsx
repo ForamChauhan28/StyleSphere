@@ -38,7 +38,7 @@ const OrdersModal = ({ isOpen, onClose }) => {
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" data-lenis-prevent="true">
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
@@ -51,6 +51,7 @@ const OrdersModal = ({ isOpen, onClose }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          data-lenis-prevent="true"
           className="relative w-full max-w-4xl max-h-[85vh] bg-background rounded-3xl shadow-2xl flex flex-col z-10 overflow-hidden"
         >
           {/* Header */}
@@ -70,7 +71,12 @@ const OrdersModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Body */}
-          <div className="overflow-y-auto flex-1 p-8 bg-gray-50/50">
+          <div 
+            data-lenis-prevent="true"
+            onWheel={(e) => e.stopPropagation()}
+            style={{ overscrollBehavior: 'contain' }}
+            className="overflow-y-auto flex-1 p-8 bg-gray-50/50"
+          >
             <div className="space-y-6">
               {mockOrders.map((order) => (
                 <div key={order.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">

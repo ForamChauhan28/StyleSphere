@@ -25,6 +25,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
   const [formData, setFormData] = useState(emptyProduct);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const formRef = React.useRef(null);
 
   useEffect(() => {
     if (product) {
@@ -33,6 +34,9 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
       setFormData(emptyProduct);
     }
     setError('');
+    if (isOpen && formRef.current) {
+      formRef.current.scrollTop = 0;
+    }
   }, [product, isOpen]);
 
   if (!isOpen) return null;
@@ -62,7 +66,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
     setSaving(true);
     try {
       if (!formData.name || !formData.price || !formData.description || !formData.image) {
-        setError('Please fill in all required fields.');
+        setError('Please fill in all required fields (Name, Category, Price, Stock, Image URL, Description).');
         setSaving(false);
         return;
       }
@@ -77,32 +81,42 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4" data-lenis-prevent="true">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         />
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-10 flex flex-col overflow-hidden"
+          data-lenis-prevent="true"
+          className="relative w-full max-w-2xl max-h-[92vh] bg-white rounded-2xl shadow-2xl z-10 flex flex-col overflow-hidden border border-gray-100"
         >
           {/* Header */}
-          <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-            <h2 className="text-xl font-bold text-primary">
-              {product ? 'Edit Product' : 'Add New Product'}
-            </h2>
-            <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0">
+            <div>
+              <h2 className="text-xl font-bold text-primary">
+                {product ? 'Edit Product' : 'Add New Product'}
+              </h2>
+              <p className="text-xs text-gray-500">Product will appear instantly in the store & admin catalog</p>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500 hover:text-gray-800">
               <X size={20} />
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
+          <form 
+            ref={formRef} 
+            onSubmit={handleSubmit} 
+            data-lenis-prevent="true"
+            className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4"
+            style={{ overscrollBehavior: 'contain' }}
+          >
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
                 {error}
@@ -111,24 +125,24 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Product Name *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Product Name *</label>
                 <input
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   required
                   placeholder="e.g. Classic White Sneakers"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Category *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Category *</label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all bg-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all bg-white text-sm"
                 >
                   {categoryOptions.map(cat => (
                     <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
@@ -137,7 +151,7 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Price (₹) *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Price (₹) *</label>
                 <input
                   name="price"
                   type="number"
@@ -146,12 +160,12 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
                   onChange={handleChange}
                   required
                   placeholder="e.g. 2999"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Stock *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Stock *</label>
                 <input
                   name="stock"
                   type="number"
@@ -159,53 +173,53 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
                   value={formData.stock}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Image URL *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Image URL *</label>
                 <div className="flex gap-2">
                   <input
                     name="image"
                     value={formData.image}
                     onChange={handleChange}
                     required
-                    placeholder="https://..."
-                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                    placeholder="https://images.unsplash.com/..."
+                    className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all text-sm"
                   />
                   {formData.image && (
-                    <img src={formData.image} alt="Preview" className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
+                    <img src={formData.image} alt="Preview" className="w-9 h-9 rounded-lg object-cover border border-gray-200 flex-shrink-0" />
                   )}
                 </div>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-1.5">Description *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Description *</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   required
-                  rows={3}
+                  rows={2}
                   placeholder="Describe the product..."
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all resize-none"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all resize-none text-sm"
                 />
               </div>
             </div>
 
             {/* Sizes */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Available Sizes</label>
-              <div className="flex flex-wrap gap-2">
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">Available Sizes</label>
+              <div className="flex flex-wrap gap-1.5">
                 {sizeOptions.map(size => (
                   <button
                     key={size}
                     type="button"
                     onClick={() => toggleSize(size)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
                       formData.sizes.includes(size)
-                        ? 'bg-primary text-white border-primary'
+                        ? 'bg-primary text-white border-primary shadow-sm'
                         : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
                     }`}
                   >
@@ -217,16 +231,16 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
 
             {/* Colors */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Available Colors</label>
-              <div className="flex flex-wrap gap-2">
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">Available Colors</label>
+              <div className="flex flex-wrap gap-1.5">
                 {colorOptions.map(color => (
                   <button
                     key={color}
                     type="button"
                     onClick={() => toggleColor(color)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
                       formData.colors.includes(color)
-                        ? 'bg-primary text-white border-primary'
+                        ? 'bg-primary text-white border-primary shadow-sm'
                         : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
                     }`}
                   >
@@ -237,20 +251,20 @@ const ProductFormModal = ({ isOpen, onClose, product, onSave }) => {
             </div>
 
             {/* Footer Buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="flex justify-end gap-3 pt-3 border-t border-gray-100 flex-shrink-0">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition-colors"
+                className="px-5 py-2 border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition-colors text-sm"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2.5 bg-primary hover:bg-gray-800 text-white rounded-xl font-bold transition-colors flex items-center gap-2 shadow-lg shadow-gray-400/30 disabled:opacity-50"
+                className="px-5 py-2 bg-primary hover:bg-gray-800 text-white rounded-xl font-bold transition-colors flex items-center gap-2 shadow-lg shadow-gray-400/30 disabled:opacity-50 text-sm"
               >
-                {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                 {saving ? 'Saving...' : (product ? 'Update Product' : 'Add Product')}
               </button>
             </div>
@@ -267,6 +281,7 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -286,17 +301,22 @@ const AdminProducts = () => {
   const handleSave = async (formData) => {
     if (editingProduct) {
       await axios.put(`/api/admin/products/${editingProduct._id}`, formData);
+      setFeedback({ type: 'success', text: `Product "${formData.name}" updated successfully!` });
     } else {
-      await axios.post('/api/admin/products', formData);
+      const res = await axios.post('/api/admin/products', formData);
+      setFeedback({ type: 'success', text: `Product "${formData.name}" added on the spot! It is now live in both admin and store frontend.` });
     }
-    fetchProducts();
+    await fetchProducts();
+    setTimeout(() => setFeedback(null), 5000);
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await axios.delete(`/api/admin/products/${id}`);
+        setFeedback({ type: 'success', text: 'Product deleted successfully.' });
         fetchProducts();
+        setTimeout(() => setFeedback(null), 4000);
       } catch (error) {
         console.error('Error deleting product:', error);
       }
@@ -313,10 +333,23 @@ const AdminProducts = () => {
     setIsModalOpen(true);
   };
 
-  if (loading) return <div className="text-center py-10">Loading products...</div>;
+  if (loading) return <div className="text-center py-10 font-medium text-gray-500">Loading products...</div>;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      {feedback && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 font-semibold flex items-center justify-between shadow-sm"
+        >
+          <span>{feedback.text}</span>
+          <button onClick={() => setFeedback(null)} className="text-green-600 hover:text-green-800">
+            <X size={18} />
+          </button>
+        </motion.div>
+      )}
+
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div>
           <h2 className="text-xl font-bold text-primary">Manage Products</h2>
@@ -324,7 +357,7 @@ const AdminProducts = () => {
         </div>
         <button
           onClick={openAddModal}
-          className="bg-primary hover:bg-gray-800 text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-colors shadow-lg shadow-gray-400/50"
+          className="bg-primary hover:bg-gray-800 text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-colors shadow-lg shadow-gray-400/50 cursor-pointer"
         >
           <Plus size={18} />
           <span className="font-bold">Add Product</span>

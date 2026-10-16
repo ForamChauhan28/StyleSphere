@@ -15,7 +15,7 @@ const TrackPackageModal = ({ isOpen, onClose }) => {
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4" data-lenis-prevent="true">
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
@@ -28,10 +28,11 @@ const TrackPackageModal = ({ isOpen, onClose }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          data-lenis-prevent="true"
           className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col z-10 overflow-hidden max-h-[90vh]"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-primary to-gray-800 px-8 py-6 flex justify-between items-start text-white">
+          <div className="bg-gradient-to-r from-primary to-gray-800 px-8 py-6 flex justify-between items-start text-white flex-shrink-0">
             <div>
               <h2 className="text-2xl font-extrabold flex items-center gap-3">
                 <Package className="text-secondary" size={28} /> Track Package
@@ -47,7 +48,12 @@ const TrackPackageModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Body */}
-          <div className="overflow-y-auto p-8 bg-gray-50 flex-1">
+          <div 
+            data-lenis-prevent="true"
+            onWheel={(e) => e.stopPropagation()}
+            style={{ overscrollBehavior: 'contain' }}
+            className="overflow-y-auto p-8 bg-gray-50 flex-1"
+          >
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
               <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
                  <div className="w-20 h-20 rounded-xl overflow-hidden shadow-sm flex-shrink-0">

@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, User } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
 
-const AuthModal = ({ isOpen, onClose }) => {
+const AuthModal = ({ isOpen, onClose, onSuccess, initialMessage }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const { addToast } = useToast();
   const navigate = useNavigate();
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setShowPassword(false);
+    onClose();
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,38 +27,47 @@ const AuthModal = ({ isOpen, onClose }) => {
     // Admin check based on email containing "admin"
     const isAdmin = email.toLowerCase().includes('admin');
 
-    localStorage.setItem('user', JSON.stringify({
+    const userData = {
       name,
       email,
       isAdmin,
       avatar: name.charAt(0).toUpperCase()
-    }));
+    };
+
+    localStorage.setItem('user', JSON.stringify(userData));
 
     addToast(`Successfully ${isLogin ? 'logged in' : 'signed up'}!`, 'success');
     window.dispatchEvent(new Event('auth-change'));
-    onClose();
+    if (onSuccess) {
+      onSuccess(userData);
+    }
+    handleClose();
   };
 
   const handleGoogleSignIn = () => {
-    localStorage.setItem('user', JSON.stringify({
+    const userData = {
       name: 'Google User',
       email: 'user@gmail.com',
       isAdmin: false,
       avatar: 'G'
-    }));
+    };
+    localStorage.setItem('user', JSON.stringify(userData));
     addToast('Successfully signed in with Google!', 'success');
     window.dispatchEvent(new Event('auth-change'));
-    onClose();
+    if (onSuccess) {
+      onSuccess(userData);
+    }
+    handleClose();
   };
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" data-lenis-prevent="true">
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }} 
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute inset-0 bg-primary/40 backdrop-blur-md" 
         />
         
@@ -60,6 +75,7 @@ const AuthModal = ({ isOpen, onClose }) => {
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          data-lenis-prevent="true"
           className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden glass z-10 border border-white/50"
         >
           {/* Decorative background */}
@@ -67,7 +83,7 @@ const AuthModal = ({ isOpen, onClose }) => {
           <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
 
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-primary transition-colors bg-white/50 rounded-full backdrop-blur-sm z-20"
           >
             <X size={20} />
@@ -82,7 +98,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                 {isLogin ? 'Welcome Back' : 'Create Account'}
               </h2>
               <p className="text-gray-500 mt-2 text-sm">
-                {isLogin ? 'Sign in to access your wardrobe & orders' : 'Join StyleSphere for exclusive benefits'}
+                {initialMessage || (isLogin ? 'Sign in to access your wardrobe & orders' : 'Join StyleSphere for exclusive benefits')}
               </p>
             </div>
 
@@ -115,11 +131,19 @@ const AuthModal = ({ isOpen, onClose }) => {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <input
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="Password"
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
+                  className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
 
               {isLogin && (
@@ -168,7 +192,11 @@ const AuthModal = ({ isOpen, onClose }) => {
             <p className="mt-8 text-center text-sm text-gray-600">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button 
-                onClick={() => setIsLogin(!isLogin)} 
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setShowPassword(false);
+                }} 
                 className="font-bold text-secondary hover:text-primary transition-colors"
               >
                 {isLogin ? 'Sign up' : 'Sign in'}

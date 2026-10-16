@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
 const Shop = () => {
@@ -11,6 +12,7 @@ const Shop = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addToast } = useToast();
+  const { isAuthenticated, openAuthModal } = useAuth();
   const [products, setProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -122,6 +124,13 @@ const Shop = () => {
   const handleAddToCart = (e, product) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!isAuthenticated) {
+      openAuthModal(() => {
+        addToCart(product);
+        addToast('Item added to cart!');
+      }, 'Please sign in to add items to your cart');
+      return;
+    }
     addToCart(product);
     addToast('Item added to cart!');
   };

@@ -131,11 +131,11 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex overflow-hidden">
+    <div className="min-h-screen bg-background flex" data-lenis-prevent="true">
       {/* Mobile overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-10 md:hidden"
+          className="fixed inset-0 bg-black/30 z-30 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -145,7 +145,7 @@ const AdminPanel = () => {
         initial={false}
         animate={{ x: isSidebarOpen ? 0 : -260 }}
         transition={{ type: 'tween', duration: 0.25 }}
-        className="fixed md:relative z-20 w-64 bg-primary h-screen text-white flex flex-col shadow-2xl"
+        className="fixed md:sticky top-0 z-30 md:z-20 w-64 bg-primary h-screen text-white flex flex-col shadow-2xl flex-shrink-0"
       >
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -159,7 +159,7 @@ const AdminPanel = () => {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 mt-4">
+        <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -199,7 +199,7 @@ const AdminPanel = () => {
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-screen min-w-0" data-lenis-prevent="true">
         {/* Top Header */}
         <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 h-16 px-6 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center space-x-4">
@@ -234,7 +234,7 @@ const AdminPanel = () => {
         </header>
 
         {/* Dynamic Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">
+        <div className="flex-1 p-6 md:p-8">
           <div className="max-w-6xl mx-auto">
             {renderContent()}
           </div>

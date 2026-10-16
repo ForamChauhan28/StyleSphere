@@ -10,6 +10,17 @@ export default function SmoothScroll({ children }) {
         duration: 1.5,
         smoothWheel: true,
         smoothTouch: false,
+        prevent: (node) => {
+          if (!node || typeof node.closest !== 'function') return false;
+          return Boolean(
+            node.closest('[data-lenis-prevent]') ||
+            node.closest('.overflow-y-auto') ||
+            node.closest('.overflow-auto') ||
+            node.closest('.overflow-y-scroll') ||
+            node.closest('[role="dialog"]') ||
+            node.closest('.fixed')
+          );
+        },
       }}
     >
       {children}

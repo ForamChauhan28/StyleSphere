@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion'
 import SmoothScroll from './components/SmoothScroll'
 import { CartProvider } from './context/CartContext'
 import { ToastProvider } from './context/ToastContext'
+import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import PromoBanner from './components/PromoBanner'
@@ -27,19 +28,25 @@ const MainLayout = ({ children }) => {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   if (isAdminRoute) {
-    return <>{children}</>;
+    return (
+      <div className="admin-root min-h-screen" data-lenis-prevent="true">
+        {children}
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <PromoBanner />
-      <Navbar />
-      <main className="flex-grow">
-        {children}
-      </main>
-      <Footer />
-      <AIStyleAssistant />
-    </div>
+    <SmoothScroll>
+      <div className="min-h-screen bg-background flex flex-col">
+        <PromoBanner />
+        <Navbar />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
+        <AIStyleAssistant />
+      </div>
+    </SmoothScroll>
   );
 };
 
@@ -71,17 +78,17 @@ const AnimatedRoutes = () => {
 
 function App() {
   return (
-    <SmoothScroll>
-      <ToastProvider>
-        <CartProvider>
-          <Router>
+    <ToastProvider>
+      <CartProvider>
+        <Router>
+          <AuthProvider>
             <MainLayout>
               <AnimatedRoutes />
             </MainLayout>
-          </Router>
-        </CartProvider>
-      </ToastProvider>
-    </SmoothScroll>
+          </AuthProvider>
+        </Router>
+      </CartProvider>
+    </ToastProvider>
   )
 }
 

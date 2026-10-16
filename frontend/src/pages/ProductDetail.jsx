@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { ShoppingCart, MapPin, Share2, Ruler, X, AlertCircle, Star } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
@@ -12,6 +13,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addToast } = useToast();
+  const { isAuthenticated, openAuthModal } = useAuth();
   
   const [product, setProduct] = useState(null);
   const [currentImage, setCurrentImage] = useState(null);
@@ -110,11 +112,25 @@ const ProductDetail = () => {
   }
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      openAuthModal(() => {
+        addToCart(product, 1, selectedSize, selectedColor);
+        addToast('Item added to cart!');
+      }, 'Please sign in to add items to your cart');
+      return;
+    }
     addToCart(product, 1, selectedSize, selectedColor);
     addToast('Item added to cart!');
   };
 
   const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      openAuthModal(() => {
+        addToCart(product, 1, selectedSize, selectedColor);
+        navigate('/cart');
+      }, 'Please sign in to purchase items');
+      return;
+    }
     addToCart(product, 1, selectedSize, selectedColor);
     navigate('/cart');
   };

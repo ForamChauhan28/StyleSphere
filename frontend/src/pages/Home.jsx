@@ -9,6 +9,7 @@ import axios from 'axios';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +17,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addToast } = useToast();
+  const { isAuthenticated, openAuthModal } = useAuth();
   const [trendingProducts, setTrendingProducts] = useState([]);
   const containerRef = useRef();
 
@@ -38,9 +40,25 @@ const Home = () => {
     }
   }, { dependencies: [trendingProducts], scope: containerRef });
 
+  const handleShopNow = (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      openAuthModal(() => navigate('/shop'), 'Please sign in to start shopping');
+    } else {
+      navigate('/shop');
+    }
+  };
+
   const handleAddToCart = (e, product) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!isAuthenticated) {
+      openAuthModal(() => {
+        addToCart(product);
+        addToast('Item added to cart!');
+      }, 'Please sign in to add items to your cart');
+      return;
+    }
     addToCart(product);
     addToast('Item added to cart!');
   };
@@ -77,9 +95,12 @@ const Home = () => {
             <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
               Discover the latest trends in clothing, blending futuristic 3D aesthetics with timeless style.
             </p>
-            <Link to="/shop" className="inline-block pointer-events-auto bg-secondary hover:bg-yellow-500 text-white px-8 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+            <button 
+              onClick={handleShopNow}
+              className="inline-block pointer-events-auto bg-secondary hover:bg-yellow-500 text-white px-8 py-4 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg cursor-pointer"
+            >
               Shop Now
-            </Link>
+            </button>
           </motion.div>
         </div>
       </section>

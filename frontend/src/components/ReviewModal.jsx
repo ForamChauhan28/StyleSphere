@@ -49,7 +49,7 @@ const ReviewModal = ({ isOpen, onClose }) => {
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4" data-lenis-prevent="true">
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
@@ -62,6 +62,7 @@ const ReviewModal = ({ isOpen, onClose }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          data-lenis-prevent="true"
           className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col z-10 overflow-hidden max-h-[90vh]"
         >
           {isSubmitted ? (
@@ -79,7 +80,7 @@ const ReviewModal = ({ isOpen, onClose }) => {
           ) : (
             <>
               {/* Header */}
-              <div className="bg-white px-8 py-6 border-b border-gray-100 flex justify-between items-center z-10">
+              <div className="bg-white px-8 py-6 border-b border-gray-100 flex justify-between items-center z-10 flex-shrink-0">
                 <h2 className="text-2xl font-extrabold text-primary">Write a Review</h2>
                 <button 
                   onClick={onClose}
@@ -90,7 +91,12 @@ const ReviewModal = ({ isOpen, onClose }) => {
               </div>
 
               {/* Body */}
-              <div className="overflow-y-auto flex-1 p-8">
+              <div 
+                data-lenis-prevent="true"
+                onWheel={(e) => e.stopPropagation()}
+                style={{ overscrollBehavior: 'contain' }}
+                className="overflow-y-auto flex-1 p-8"
+              >
                  <div className="flex items-center gap-4 mb-8">
                     <img src="https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?q=80&w=200&auto=format&fit=crop" alt="Item" className="w-16 h-16 rounded-lg object-cover" />
                     <div>
@@ -177,7 +183,7 @@ const ReviewModal = ({ isOpen, onClose }) => {
                  </form>
               </div>
               
-              <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-4 z-10">
+              <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-4 z-10 flex-shrink-0">
                  <button onClick={onClose} className="px-6 py-3 font-bold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors">
                     Cancel
                  </button>

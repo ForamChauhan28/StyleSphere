@@ -1,0 +1,29 @@
+[
+  {
+    "title": "summer",
+    "description": "toooo coooooolll.....",
+    "discountPercent": 37,
+    "isActive": true,
+    "validUntil": "2026-10-16T00:00:00.000Z",
+    "_id": "6ad252de45241e859249e5ac",
+    "createdAt": "2026-10-16T16:37:50.186Z",
+    "updatedAt": "2026-10-16T16:37:50.186Z",
+    "__v": 0
+  },
+  {
+    "_id": "offer1",
+    "title": "Summer Sale",
+    "description": "Up to 50% off on summer collection",
+    "discountPercent": 50,
+    "isActive": true,
+    "code": "SUMMER50"
+  },
+  {
+    "_id": "offer2",
+    "title": "New User Welcome",
+    "description": "Get 20% off on your first order",
+    "discountPercent": 20,
+    "isActive": true,
+    "code": "WELCOME20"
+  }
+]
